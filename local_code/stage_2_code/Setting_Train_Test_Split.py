@@ -17,6 +17,7 @@ class Setting_Train_Test_Split(setting):
         # load dataset
         loaded_data = self.dataset.load()
 
+        # X is input data & y is predicted value
         X_train, X_test, y_train, y_test = train_test_split(loaded_data['X'], loaded_data['y'], test_size = 0.33)
 
         # run MethodModule
@@ -30,5 +31,3 @@ class Setting_Train_Test_Split(setting):
         self.evaluate.data = learned_result
         
         return self.evaluate.evaluate(), None
-
-        
