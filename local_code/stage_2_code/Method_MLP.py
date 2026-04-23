@@ -10,14 +10,17 @@ from local_code.stage_2_code.Evaluate_Accuracy import Evaluate_Accuracy
 import torch
 from torch import nn
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class Method_MLP(method, nn.Module):
     data = None
     # it defines the max rounds to train the model
-    max_epoch = 100
+    max_epoch = 50
     # it defines the learning rate for gradient descent based optimizer for model learning
     learning_rate = 1e-3
+    # folder path to save the convergence curve plot
+    result_destination_folder_path = None
 
     # it defines the the MLP model architecture, e.g.,
     # how many layers, size of variables in each layer, activation function, etc.
@@ -53,10 +56,23 @@ class Method_MLP(method, nn.Module):
     def train(self, X, y):
         # check here for the torch.optim doc: https://pytorch.org/docs/stable/optim.html
         optimizer = torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+
+        #################
+        # LOSS FUNCTIONS#
+        #################
+
         # check here for the nn.CrossEntropyLoss doc: https://pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html
         loss_function = nn.CrossEntropyLoss()
+        # loss_function = nn.MSELoss() # https://docs.pytorch.org/docs/stable/generated/torch.nn.MSELoss.html#
+        # loss_function = nn.NLLLoss() # https://docs.pytorch.org/docs/stable/generated/torch.nn.NLLLoss.html
+        # loss_function = nn.BCELoss() # https://docs.pytorch.org/docs/stable/generated/torch.nn.BCELoss.html
+        # loss_function = nn.MultiLabelMarginLoss # https://docs.pytorch.org/docs/stable/generated/torch.nn.BCELoss.html
+
         # for training accuracy investigation purpose
         accuracy_evaluator = Evaluate_Accuracy('training evaluator', '')
+        # record loss and accuracy at each epoch for convergence curves
+        loss_history = []
+        accuracy_history = []
 
         # it will be an iterative gradient updating process
         # we don't do mini-batch, we use the whole input as one batch
@@ -67,7 +83,7 @@ class Method_MLP(method, nn.Module):
             # convert y to torch.tensor as well
             y_true = torch.LongTensor(np.array(y))
             # calculate the training loss
-            train_loss = loss_function(y_pred, y_true)
+            train_loss = loss_function(y_pred, y_true) # Cross Entropy Loss
 
             # check here for the gradient init doc: https://pytorch.org/docs/stable/generated/torch.optim.Optimizer.zero_grad.html
             optimizer.zero_grad()
@@ -78,15 +94,22 @@ class Method_MLP(method, nn.Module):
             # update the variables according to the optimizer and the gradients calculated by the above loss.backward function
             optimizer.step()
 
+            loss_history.append(train_loss.item())
+
             if epoch%10 == 0:
                 accuracy_evaluator.data = {'true_y': y_true, 'pred_y': y_pred.max(1)[1]}
                 metrics = accuracy_evaluator.evaluate()
+                accuracy_history.append(metrics['Accuracy'])
                 print('Epoch:', epoch,
                       'Accuracy:', metrics['Accuracy'],
                       'Loss:', train_loss.item(),
                       'F1:', metrics['F1'],
                       'Precision:', metrics['Precision'],
                       'Recall:', metrics['Recall'])
+            else:
+                accuracy_history.append((y_pred.max(1)[1] == y_true).float().mean().item())
+
+        return loss_history, accuracy_history
     
     def test(self, X):
         # do the testing, and result the result
@@ -98,8 +121,33 @@ class Method_MLP(method, nn.Module):
     def run(self):
         print('method running...')
         print('--start training...')
-        self.train(self.data['train']['X'], self.data['train']['y'])
+        loss_history, accuracy_history = self.train(self.data['train']['X'], self.data['train']['y'])
         print('--start testing...')
         pred_y = self.test(self.data['test']['X'])
+
+        epochs = range(1, len(loss_history) + 1)
+
+        # Epoch vs. Loss Plot
+        print('creating Epoch vs. Loss Plot...')
+        plt.figure()
+        plt.plot(epochs, loss_history)
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.title('Learning Convergence Curve - Loss')
+        plt.show()
+        plt.savefig(self.result_destination_folder_path + 'convergence_loss.png')
+
+        # Epoch vs. Accuracy Plot
+        print('creating Epoch vs. Accuracy Plot...')
+        plt.figure()
+        plt.plot(epochs, accuracy_history)
+        plt.xlabel('Epoch')
+        plt.ylabel('Accuracy')
+        plt.title('Learning Convergence Curve - Accuracy')
+        plt.show()
+        plt.savefig(self.result_destination_folder_path + 'convergence_accuracy.png')
+
+
+
         return {'pred_y': pred_y, 'true_y': self.data['test']['y']}
             

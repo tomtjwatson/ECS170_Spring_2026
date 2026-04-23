@@ -7,6 +7,7 @@ from local_code.stage_2_code.Setting import Setting
 from local_code.stage_2_code.Evaluate_Accuracy import Evaluate_Accuracy
 import numpy as np
 import torch
+import os
 
 #---- Multi-Layer Perceptron script ----
 if 1:
@@ -23,6 +24,9 @@ if 1:
 
     method_obj = Method_MLP('multi-layer perceptron', '')
 
+    # matplot convergence curve plot
+    method_obj.result_destination_folder_path = '../../script/stage_2_script/'
+
     result_obj = Result_Saver('saver', '')
     result_obj.result_destination_folder_path = '../../result/stage_2_result/MLP_'
     result_obj.result_destination_file_name = 'prediction_result'
@@ -31,8 +35,17 @@ if 1:
     # setting_obj = Setting_KFold_CV('k fold cross validation', '')
     # setting_obj = Setting_Train_Test_Split('train test split', '')
 
-    evaluate_obj = Evaluate_Accuracy('accuracy', '')
+    evaluate_obj = Evaluate_Accuracy('accuracy, f1, precision, recall', '')
     # ------------------------------------------------------
+
+    # clean prev convergence plots
+    for plot_file in ['convergence_accuracy.png', 'convergence_loss.png']:
+        path = method_obj.result_destination_folder_path + plot_file
+        if os.path.exists(path):
+            os.remove(path)
+            print(f'cleaned {plot_file}')
+        else:
+            print(f'{plot_file} does not exist')
 
     # ---- running section ---------------------------------
     print('************ Start ************')
@@ -40,10 +53,10 @@ if 1:
     setting_obj.print_setup_summary()
     # mean_score, std_score = setting_obj.load_run_save_evaluate()
     scores, x = setting_obj.load_run_save_evaluate()
-    print('Learned model applied to learning set')
+    print('************ Learned model applied to learning set ************')
     # print('MLP Accuracy: ' + str(mean_score) + ' +/- ' + str(std_score))
     for metric, value in scores.items():
-        print(f'MLP {metric}: {value}')
+        print(f'{metric}: {value}')
     print('************ Finish ************')
     # ------------------------------------------------------
     
