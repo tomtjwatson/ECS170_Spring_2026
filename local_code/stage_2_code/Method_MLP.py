@@ -82,11 +82,11 @@ class Method_MLP(method, nn.Module):
                 accuracy_evaluator.data = {'true_y': y_true, 'pred_y': y_pred.max(1)[1]}
                 metrics = accuracy_evaluator.evaluate()
                 print('Epoch:', epoch,
-                      'Accuracy:', metrics['accuracy'],
+                      'Accuracy:', metrics['Accuracy'],
                       'Loss:', train_loss.item(),
-                      'F1:', metrics['f1'],
-                      'Precision:', metrics['precision'],
-                      'Recall:', metrics['recall'])
+                      'F1:', metrics['F1'],
+                      'Precision:', metrics['Precision'],
+                      'Recall:', metrics['Recall'])
     
     def test(self, X):
         # do the testing, and result the result
