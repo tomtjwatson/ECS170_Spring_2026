@@ -15,12 +15,11 @@ class Dataset_Loader(dataset):
     
     def __init__(self, dName=None, dDescription=None):
         super().__init__(dName, dDescription)
-    
-    def load(self):
-        print('loading data...')
+
+    def load(self, filename):
         X = []
         y = []
-        f = open(self.dataset_source_folder_path + self.dataset_source_file_name, 'r')
+        f = open(self.dataset_source_folder_path + filename, 'r')
         for line in f:
             line = line.strip('\n')
             elements = [int(i) for i in line.split(',')]
@@ -28,3 +27,10 @@ class Dataset_Loader(dataset):
             y.append(elements[0])
         f.close()
         return {'X': X, 'y': y}
+
+    def load_data(self):
+        print('loading data...')
+        return {
+            'train': self.load('train.csv'),
+            'test':  self.load('test.csv'),
+        }
