@@ -1,3 +1,5 @@
 *.csv
 misc.xml
 *.iml
+*.png
+/.idea/

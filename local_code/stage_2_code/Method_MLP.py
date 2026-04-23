@@ -11,12 +11,13 @@ import torch
 from torch import nn
 import numpy as np
 from sklearn.metrics import accuracy_score, f1_score, recall_score, precision_score
+import matplotlib.pyplot as plt
 
 
 class Method_MLP(method, nn.Module):
     data = None
     # it defines the max rounds to train the model
-    max_epoch = 500
+    max_epoch = 100
     # it defines the learning rate for gradient descent based optimizer for model learning
     learning_rate = 1e-3
 
@@ -67,6 +68,7 @@ class Method_MLP(method, nn.Module):
         # it will be an iterative gradient updating process
         # we don't do mini-batch, we use the whole input as one batch
         # you can try to split X and y into smaller-sized batches by yourself
+        loss_history = []
         for epoch in range(self.max_epoch): # you can do an early stop if self.max_epoch is too much...
             # get the output, we need to covert X into torch.tensor so pytorch algorithm can operate on it
             y_pred = self.forward(torch.FloatTensor(np.array(X)))
@@ -84,9 +86,22 @@ class Method_MLP(method, nn.Module):
             # update the variables according to the optimizer and the gradients calculated by the above loss.backward function
             optimizer.step()
 
-            if epoch%100 == 0:
+            loss_history.append(train_loss.item())
+
+            if epoch%10 == 0:
                 accuracy_evaluator.data = {'true_y': y_true, 'pred_y': y_pred.max(1)[1]}
-                print('Epoch:', epoch, 'Accuracy:', accuracy_evaluator.evaluate(), 'Loss:', train_loss.item())
+                metrics = accuracy_evaluator.evaluate()
+                print(f'Epoch: {epoch} | Accuracy: {metrics["Accuracy"]}, '
+                      f'Loss: {train_loss.item()}, F1(w): {metrics["F1 weighted"]}, '
+                      f'Precision(w): {metrics["Precision weighted"]}, Recall(w): {metrics["Recall weighted"]}\n')
+
+        plt.figure()
+        plt.plot(range(self.max_epoch), loss_history)
+        plt.xlabel('Epoch')
+        plt.ylabel('Loss')
+        plt.title('Epoch vs. Loss Plot')
+        plt.savefig('../../script/stage_2_script/MLP_convergence_plot.png')
+        print(f"MLP_convergence_plot.png created")
     
     def test(self, X):
         # do the testing, and result the result
