@@ -11,20 +11,28 @@ from local_code.base_class.dataset import dataset
 class Dataset_Loader(dataset):
     data = None
     dataset_source_folder_path = None
-    dataset_source_file_name = None
-    
+
+    dataset_source_file_name_train = None
+    dataset_source_file_name_test = None
+
     def __init__(self, dName=None, dDescription=None):
         super().__init__(dName, dDescription)
-    
-    def load(self):
-        print('loading data...')
+
+    def load(self, file_name):
         X = []
         y = []
-        f = open(self.dataset_source_folder_path + self.dataset_source_file_name, 'r')
-        for line in f:
-            line = line.strip('\n')
-            elements = [int(i) for i in line.split(',')]
+        file = open(self.dataset_source_folder_path + file_name, 'r')
+        for line in file:
+            elements = [int(i) for i in line.strip('\n').split(',')]
             y.append(elements[0])
             X.append(elements[1:])
-        f.close()
         return {'X': X, 'y': y}
+
+    def load_data(self):
+        print('loading data...')
+        if self.dataset_source_file_name_train and self.dataset_source_file_name_test:
+            return {
+                'train': self.load(self.dataset_source_file_name_train),
+                'test': self.load(self.dataset_source_file_name_test),
+            }
+        return self.load(self.dataset_source_file_name)
