@@ -12,6 +12,9 @@ class Dataset_Loader(dataset):
     data = None
     dataset_source_folder_path = None
 
+    dataset_source_file_name_train = None
+    dataset_source_file_name_test = None
+
     def __init__(self, dName=None, dDescription=None):
         super().__init__(dName, dDescription)
 
@@ -27,7 +30,9 @@ class Dataset_Loader(dataset):
 
     def load_data(self):
         print('loading data...')
-        return {
-            'train': self.load('train.csv'),
-            'test':  self.load('test.csv'),
-        }
+        if self.dataset_source_file_name_train and self.dataset_source_file_name_test:
+            return {
+                'train': self.load(self.dataset_source_file_name_train),
+                'test': self.load(self.dataset_source_file_name_test),
+            }
+        return self.load(self.dataset_source_file_name)
