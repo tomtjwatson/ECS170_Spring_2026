@@ -1,5 +1,7 @@
 from local_code.stage_2_code.Dataset_Loader import Dataset_Loader
-from local_code.stage_2_code.Method_MLP import Method_MLP
+from local_code.stage_2_code.Method_MLP_exp1 import Method_MLP
+from local_code.stage_2_code.Method_MLP_exp1 import Method_MLP_exp1
+from local_code.stage_2_code.Method_MLP_exp2 import Method_MLP_exp2
 from local_code.stage_2_code.Result_Saver import Result_Saver
 from local_code.stage_2_code.Setting import Setting
 # from local_code.stage_2_code.Setting_KFold_CV import Setting_KFold_CV
@@ -21,7 +23,9 @@ if 1:
     dataset_obj = Dataset_Loader('stage2', '')
     dataset_obj.dataset_source_folder_path = '../../data/stage_2_data/'
 
-    method_obj = Method_MLP('multi-layer perceptron', '')
+    # method_obj = Method_MLP('multi-layer perceptron', '')
+    method_obj = Method_MLP_exp1('multi-layer perceptron (exp1)', '')
+    # method_obj = Method_MLP_exp2('multi-layer perceptron (exp2)', '')
 
     result_obj = Result_Saver('saver', '')
     result_obj.result_destination_folder_path = '../../result/stage_2_result/MLP_'

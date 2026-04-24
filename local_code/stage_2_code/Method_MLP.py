@@ -29,15 +29,11 @@ class Method_MLP(method, nn.Module):
         nn.Module.__init__(self)
         # check here for nn.Linear doc: https://pytorch.org/docs/stable/generated/torch.nn.Linear.html
         self.fc_layer_1 = nn.Linear(784, 256)
-        self.bn_1 = nn.BatchNorm1d(256) 
         # check here for nn.ReLU doc: https://pytorch.org/docs/stable/generated/torch.nn.ReLU.html
         self.activation_func_1 = nn.ReLU()
-        self.fc_layer_2 = nn.Linear(256, 128)
-        self.bn_2 = nn.BatchNorm1d(128) 
-        self.activation_func_2 = nn.ReLU()
+        self.fc_layer_2 = nn.Linear(256, 10)
         # check here for nn.Softmax doc: https://pytorch.org/docs/stable/generated/torch.nn.Softmax.html
-        self.fc_layer_3 = nn.Linear(128, 10)
-        self.activation_func_3 = nn.Softmax(dim=1)
+        self.activation_func_2 = nn.Softmax(dim=1)
 
     # it defines the forward propagation function for input x
     # this function will calculate the output layer by layer
@@ -45,13 +41,12 @@ class Method_MLP(method, nn.Module):
     def forward(self, x):
         '''Forward propagation'''
         # hidden layer embeddings
-        h = self.activation_func_1(self.bn_1(self.fc_layer_1(x)))
+        h = self.activation_func_1(self.fc_layer_1(x))
         # outout layer result
         # self.fc_layer_2(h) will be a nx2 tensor
         # n (denotes the input instance number): 0th dimension; 2 (denotes the class number): 1st dimension
         # we do softmax along dim=1 to get the normalized classification probability distributions for each instance
-        h = self.activation_func_2(self.bn_2(self.fc_layer_2(h)))
-        y_pred = self.activation_func_3(self.fc_layer_3(h))
+        y_pred = self.activation_func_2(self.fc_layer_2(h))
         return y_pred
 
     # backward error propagation will be implemented by pytorch automatically
@@ -113,17 +108,17 @@ class Method_MLP(method, nn.Module):
     def evaluate_metrics(self, true_y, pred_y):
         accuracy  = accuracy_score(true_y, pred_y)
 
-        f1_weighted = f1_score(true_y, pred_y, average='weighted')
-        f1_macro = f1_score(true_y, pred_y, average='macro')
-        f1_micro = f1_score(true_y, pred_y, average='micro')
+        f1_weighted = f1_score(true_y, pred_y, average='weighted', zero_division=0)
+        f1_macro = f1_score(true_y, pred_y, average='macro', zero_division=0)
+        f1_micro = f1_score(true_y, pred_y, average='micro', zero_division=0)
 
-        recall_weighted = recall_score(true_y, pred_y, average='weighted')
-        recall_macro = recall_score(true_y, pred_y, average='macro')
-        recall_micro = recall_score(true_y, pred_y, average='micro')
+        recall_weighted = recall_score(true_y, pred_y, average='weighted', zero_division=0)
+        recall_macro = recall_score(true_y, pred_y, average='macro', zero_division=0)
+        recall_micro = recall_score(true_y, pred_y, average='micro', zero_division=0)
 
-        precision_weighted = precision_score(true_y, pred_y, average='weighted')
-        precision_macro = precision_score(true_y, pred_y, average='macro')
-        precision_micro = precision_score(true_y, pred_y, average='micro')
+        precision_weighted = precision_score(true_y, pred_y, average='weighted', zero_division=0)
+        precision_macro = precision_score(true_y, pred_y, average='macro', zero_division=0)
+        precision_micro = precision_score(true_y, pred_y, average='micro', zero_division=0)
 
         print(f'  Accuracy:            {accuracy:.4f}')
         print(f'  F1(weighted):       {f1_weighted:.4f}')
