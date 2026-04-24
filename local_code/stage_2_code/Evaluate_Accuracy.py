@@ -18,8 +18,14 @@ class Evaluate_Accuracy(evaluate):
         pred_y = self.data['pred_y']
         return {
             'Accuracy': accuracy_score(true_y, pred_y),
-            'F1': f1_score(true_y, pred_y, average='weighted', zero_division=0),
-            'Precision': precision_score(true_y, pred_y, average='weighted', zero_division=0),
-            'Recall': recall_score(true_y, pred_y, average='weighted', zero_division=0),
+            'F1 weighted': f1_score(true_y, pred_y, average='weighted', zero_division=0),
+            'F1 macro' : f1_score(true_y, pred_y, average='macro', zero_division=0),
+            'F1 micro' : f1_score(true_y, pred_y, average='micro', zero_division=0),
+            'Precision weighted': precision_score(true_y, pred_y, average='weighted', zero_division=0),
+            'Precision macro': precision_score(true_y, pred_y, average='macro', zero_division=0),
+            'Precision micro': precision_score(true_y, pred_y, average='micro', zero_division=0),
+            'Recall weighted': recall_score(true_y, pred_y, average='weighted', zero_division=0),
+            'Recall macro': recall_score(true_y, pred_y, average='macro', zero_division=0),
+            'Recall micro': recall_score(true_y, pred_y, average='micro', zero_division=0)
         }
         
