@@ -20,12 +20,19 @@ class Method_MLP_exp2(Method_MLP):
         # ---- Layer configuration: edit this list to add or remove hidden layers ----
         # Format: [input_size, hidden_1, hidden_2, ..., output_size]
         # The last size is always the output (10 classes for MNIST)
-        layer_sizes = [784, 1024, 512, 256, 128, 64, 10]
+        layer_sizes = [784, 256, 128, 64, 10]
         # ----------------------------------------------------------------------------
 
         # check here for nn.Linear doc: https://pytorch.org/docs/stable/generated/torch.nn.Linear.html
         # check here for nn.ReLU doc: https://pytorch.org/docs/stable/generated/torch.nn.ReLU.html
         # Build hidden layers (everything except the final output layer)
+
+        ### Non Norm Batch
+        # self.hidden_layers = nn.ModuleList()
+        # for i in range(len(layer_sizes) - 2):  # -2 to ignore going to output layer
+        #     self.hidden_layers.append(nn.Linear(layer_sizes[i], layer_sizes[i + 1]))
+
+        ### Norm Batch
         self.hidden_layers = nn.ModuleList()
         self.batch_norms = nn.ModuleList()
         for i in range(len(layer_sizes) - 2): # -2 to ignore going to output layer
@@ -44,6 +51,12 @@ class Method_MLP_exp2(Method_MLP):
         '''Forward propagation'''
         # hidden layer embeddings
         h = x
+
+        ### Non norm batch
+        # for i in range(len(self.hidden_layers)):
+        #     h = self.activation_func(self.hidden_layers[i](h))
+
+        ### Norm batch
         for i in range(len(self.hidden_layers)):
             h = self.activation_func(self.batch_norms[i](self.hidden_layers[i](h)))
         # self.fc_output(h) will be a nx10 tensor

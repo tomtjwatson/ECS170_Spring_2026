@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 class Method_MLP(method, nn.Module):
     data = None
     # it defines the max rounds to train the model
-    max_epoch = 100
+    max_epoch = 500
     # it defines the learning rate for gradient descent based optimizer for model learning
     learning_rate = 1e-3
 
@@ -83,7 +83,7 @@ class Method_MLP(method, nn.Module):
 
             loss_history.append(train_loss.item())
 
-            if epoch%10 == 0:
+            if epoch%100 == 0:
                 accuracy_evaluator.data = {'true_y': y_true, 'pred_y': y_pred.max(1)[1]}
                 metrics = accuracy_evaluator.evaluate()
                 print(f'Epoch: {epoch} | Accuracy: {metrics["Accuracy"]}, '
